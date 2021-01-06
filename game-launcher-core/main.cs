@@ -49,10 +49,16 @@ namespace gamelaunchercore
             {
                 Console.WriteLine("-------{0}-------", netInfo.Name);
                 var unis = netInfo.GetIPProperties().UnicastAddresses;
-                if(unis.Count > 0)
+                foreach(var uni in unis)
                 {
-                    Console.WriteLine("{0}", unis[0].Address.ToString());
-                    result.Add(netInfo.Name);
+                    if(uni.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                    {
+                        Console.WriteLine("ipv4: {0}", uni.Address.ToString());
+                    }
+                    else if(uni.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+                    {
+                        Console.WriteLine("ipv6: {0}", uni.Address.ToString());
+                    }
                 }
                 Console.WriteLine("-----------------");
             }
