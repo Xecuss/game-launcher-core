@@ -7,8 +7,8 @@ namespace gamelaunchercore
         public static void Main(string[] args)
         {
             LauncherCore core = new LauncherCore(@"./sxLauncher.json");
-            GameConfig conf = core.GetGameConfig(1603371542739);
-            Console.WriteLine(conf.name);
+
+            Console.WriteLine(core.cmd);
 
             core.DeleteGameConfig(637415013148105890);
 

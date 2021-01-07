@@ -1,6 +1,5 @@
 ﻿using System.Text.Json;
 using System.IO;
-using System;
 using System.Net.NetworkInformation;
 using System.Collections.Generic;
 
@@ -11,13 +10,42 @@ namespace gamelaunchercore
         private LauncherConfig conf;
         private string savePath;
         private List<LocalNetwork> localNets;
+        private long selected;
+
+        public string cmd
+        {
+            get
+            {
+                GameConfig useConf = conf.configs.Find(item => item.id == selected);
+                string res = "spice64";
+                if (useConf.useSpice32) res = "spice";
+                if (useConf.use720p) res += " -sdvx720";
+                if (useConf.window) res += " -w";
+                if (useConf.usePrinter)
+                {
+                    res += " -printer";
+                    if (useConf.printerPath.Trim() != "") res += $" -printerPath \"{useConf.printerPath}\"";
+                }
+                if (useConf.card.Trim() != "") res += $" -card0 {useConf.card}";
+                NetworkConfig network = conf.useAbleNetWorkConf.Find(item => item.id == useConf.nowUseNetwork);
+                if(network != null)
+                {
+                    if (network.url.Trim() != "") res += $" -url {network.url}";
+                    res += network.urlSlash ? " -urlslash 1" : " -urlslash 0";
+                    res += network.http11 ? " -http11 1" : " -http11 0";
+                    if (network.pcbId.Trim() != "") res += $" -p {network.pcbId}";
+                }
+                return res;
+            }
+        }
 
         public LauncherCore(string path)
         {
             string confStr = File.ReadAllText(path);
             conf = JsonSerializer.Deserialize<LauncherConfig>(confStr);
             savePath = path;
-            localNets = new List<LocalNetwork>();
+            GetNetworkList();
+            selected = conf.configs[0].id;
         }
 
         public GameConfig GetGameConfig(long id)
@@ -45,6 +73,7 @@ namespace gamelaunchercore
 
         public LocalNetwork[] GetNetworkList()
         {
+            localNets = new List<LocalNetwork>();
             NetworkInterface[] netInfos = NetworkInterface.GetAllNetworkInterfaces();
             foreach(var netInfo in netInfos)
             {
