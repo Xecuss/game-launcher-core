@@ -65,7 +65,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="main.cs" />
-    <Compile Include="lib\config.class.cs" />
+    <Compile Include="lib\Config.cs" />
+    <Compile Include="lib\NetworkConfig.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

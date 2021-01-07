@@ -10,12 +10,14 @@ namespace gamelaunchercore
     {
         private LauncherConfig conf;
         private string savePath;
+        private List<LocalNetwork> localNets;
 
         public LauncherCore(string path)
         {
             string confStr = File.ReadAllText(path);
             conf = JsonSerializer.Deserialize<LauncherConfig>(confStr);
             savePath = path;
+            localNets = new List<LocalNetwork>();
         }
 
         public GameConfig GetGameConfig(long id)
@@ -41,28 +43,29 @@ namespace gamelaunchercore
             return conf.configs.Remove(GetGameConfig(id));
         }
 
-        public string[] GetNetworkList()
+        public LocalNetwork[] GetNetworkList()
         {
-            List<string> result = new List<string>();
             NetworkInterface[] netInfos = NetworkInterface.GetAllNetworkInterfaces();
             foreach(var netInfo in netInfos)
             {
-                Console.WriteLine("-------{0}-------", netInfo.Name);
+                LocalNetwork tempLocalNet = new LocalNetwork(netInfo.Name);
                 var unis = netInfo.GetIPProperties().UnicastAddresses;
+
                 foreach(var uni in unis)
                 {
                     if(uni.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
                     {
-                        Console.WriteLine("ipv4: {0}", uni.Address.ToString());
+                        tempLocalNet.ipv4 = uni.Address.ToString();
                     }
                     else if(uni.Address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
                     {
-                        Console.WriteLine("ipv6: {0}", uni.Address.ToString());
+                        tempLocalNet.ipv6 = uni.Address.ToString();
                     }
                 }
-                Console.WriteLine("-----------------");
+
+                localNets.Add(tempLocalNet);
             }
-            return result.ToArray();
+            return localNets.ToArray();
         }
     }
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 
 namespace gamelaunchercore
 {
@@ -13,7 +12,14 @@ namespace gamelaunchercore
 
             core.DeleteGameConfig(637415013148105890);
 
-            core.GetNetworkList();
+            LocalNetwork[] nets = core.GetNetworkList();
+
+            foreach(LocalNetwork net in nets)
+            {
+                Console.WriteLine("{0}: ", net.name);
+                Console.WriteLine("   v4: {0}", net.ipv4);
+                Console.WriteLine("   v6: {0}", net.ipv6);
+            }
         }
     }
 }
